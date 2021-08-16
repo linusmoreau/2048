@@ -2,10 +2,14 @@ import java.util.Scanner;
 
 public class App {
     static void display(int[][] grid) {
+        String text;
         for (int i = 0; i < grid.length; i++) {
             for (int j = 0; j < grid[i].length; j++) {
-                System.out.print(grid[i][j]);
-                System.out.print(' ');
+                text = String.valueOf(grid[i][j]);
+                for (int k = text.length(); k < 8; k++) {
+                    text += " ";
+                }
+                System.out.print(text);
             }
             System.out.println();
         }
@@ -87,47 +91,72 @@ public class App {
         return ngrid;
     }
 
+    static int[][] clone(int[][] grid) {
+        int[][] ngrid = new int[grid.length][grid[0].length];
+        for (int i = 0; i < grid.length; i++) {
+            ngrid[i] = grid[i].clone();
+        }
+        return ngrid;
+    }
+
     public static void main(String[] args) {
         int width, height;
-        int [][] grid;
+        int [][] grid, tgrid;
         String input;
         Scanner scanner;
+        boolean end, moved;
         width = 4;
         height = 4;
         grid = new int[height][width];
         scanner = new Scanner(System.in);
         generate(grid);
+        end = false;
         while (generate(grid)) {
             display(grid);
-            input = (String)scanner.nextLine();
-            if (input.equals("quit")) {
-                break;
-            } else {
-                while (! input.equals("w") && ! input.equals("a") && ! input.equals("s") && ! input.equals("d")) {
-                    input = scanner.nextLine();
-                }
-                int [][] tgrid;
-                if (input.equals("a")) {
-                    tgrid = grid;
+            moved = false;
+            while (!moved) {
+                input = scanner.nextLine();
+                if (input.equals("quit")) {
+                    end = true;
+                    break;
+                } else if (input.equals("a")) {
+                    tgrid = clone(grid);
                 } else if (input.equals("s")) {
                     tgrid = rotate(grid);
                 } else if (input.equals("d")) {
                     tgrid = rotate(rotate(grid));
-                } else {
+                } else if (input.equals("w")) {
                     tgrid = rotate(rotate(rotate(grid)));
+                } else {
+                    continue;
                 }
                 fall(tgrid);
                 merge(tgrid);
                 fall(tgrid);
-                if (input.equals("a")) {
-                    grid = tgrid;
-                } else if (input.equals("s")) {
-                    grid = rotate(rotate(rotate(tgrid)));
+                if (input.equals("s")) {
+                    tgrid = rotate(rotate(rotate(tgrid)));
                 } else if (input.equals("d")) {
-                    grid = rotate(rotate(tgrid));
+                    tgrid = rotate(rotate(tgrid));
+                } else if (input.equals("w")) {
+                    tgrid = rotate(tgrid);
                 } else {
-                    grid = rotate(tgrid);
+                    ;
                 }
+                for (int i = 0; i < grid.length; i++) {
+                    for (int j = 0; j < grid[i].length; j++) {
+                        if (grid[i][j] != tgrid[i][j]) {
+                            moved = true;
+                            grid = tgrid;
+                            break;
+                        }
+                    }
+                    if (moved) {
+                        break;
+                    }
+                }
+            }
+            if (end) {
+                break;
             }
             System.out.println();
         }
