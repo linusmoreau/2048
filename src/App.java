@@ -99,26 +99,30 @@ public class App {
         return ngrid;
     }
 
-    public static void main(String[] args) {
-        int width, height;
+    static boolean isdifferent(int[][] grid1, int[][]grid2) {
+        for (int i = 0; i < grid1.length; i++) {
+            for (int j = 0; j < grid1[i].length; j++) {
+                if (grid1[i][j] != grid2[i][j]) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    static boolean game(int width, int height, Scanner scanner) {
         int [][] grid, tgrid;
         String input;
-        Scanner scanner;
-        boolean end, moved;
-        width = 4;
-        height = 4;
         grid = new int[height][width];
-        scanner = new Scanner(System.in);
         generate(grid);
-        end = false;
         while (generate(grid)) {
             display(grid);
-            moved = false;
-            while (!moved) {
+            while (true) {
                 input = scanner.nextLine();
                 if (input.equals("quit")) {
-                    end = true;
-                    break;
+                    return false;
+                } else if (input.equals("restart")) {
+                    return true;
                 } else if (input.equals("a")) {
                     tgrid = clone(grid);
                 } else if (input.equals("s")) {
@@ -142,25 +146,31 @@ public class App {
                 } else {
                     ;
                 }
-                for (int i = 0; i < grid.length; i++) {
-                    for (int j = 0; j < grid[i].length; j++) {
-                        if (grid[i][j] != tgrid[i][j]) {
-                            moved = true;
-                            grid = tgrid;
-                            break;
-                        }
-                    }
-                    if (moved) {
-                        break;
-                    }
+                if (isdifferent(grid, tgrid)) {
+                    grid = tgrid;
+                    break;
                 }
-            }
-            if (end) {
-                break;
             }
             System.out.println();
         }
         System.out.println("Game Over");
+        System.out.println("Restart? (y/n)");
+        while (true) {
+            input = scanner.nextLine();
+            if (input.equals("y")) {
+                return true;
+            } else if (input.equals("n")) {
+                return false;
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        int width, height;
+        width = 4;
+        height = 4;
+        Scanner scanner = new Scanner(System.in);
+        while (game(width, height, scanner));
         scanner.close();
     }
 }
