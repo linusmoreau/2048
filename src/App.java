@@ -1,4 +1,8 @@
 import java.util.Scanner;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class App {
     static void display(int[][] grid) {
@@ -110,6 +114,56 @@ public class App {
         return false;
     }
 
+    static void save(int[][] grid) {
+        try {
+            File file = new File("save.txt");
+            file.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            FileWriter writer = new FileWriter("save.txt");
+            for (int i = 0; i < grid.length; i++) {
+                for (int j = 0; j < grid[i].length; j++) {
+                    if (j > 0) {
+                        writer.write(",");
+                    }
+                    writer.write(Integer.toString(grid[i][j]));
+                }
+                writer.write("\n");
+            }
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    static int[][] load(int[][] grid) {
+        try {
+            File file = new File("save.txt");
+            Scanner scanner = new Scanner(file);
+            int i = 0;
+            while (scanner.hasNextLine()) {
+                String sline = scanner.nextLine();
+                String split[] = sline.split(",");
+                if (i == 0) {
+                    grid = new int[split.length][split.length];
+                }
+                for (int j = 0; j < split.length; j++) {
+                    grid[i][j] = Integer.parseInt(split[j]);
+                }
+                i += 1;
+                if (i > split.length) {
+                    break;
+                }
+            }
+            scanner.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("No save file found.");
+        }
+        return grid;
+    }
+
     static boolean game(int width, int height, Scanner scanner) {
         int [][] grid, tgrid;
         String input;
@@ -132,6 +186,12 @@ public class App {
                 } else if (input.equals("w")) {
                     tgrid = rotate(rotate(rotate(grid)));
                 } else {
+                    if (input.equals("save")) {
+                        save(grid);
+                    } else if (input.equals("load")) {
+                        grid = load(grid);
+                        display(grid);
+                    }
                     continue;
                 }
                 fall(tgrid);
