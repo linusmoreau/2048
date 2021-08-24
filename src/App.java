@@ -5,8 +5,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 public class App {
+    static int score, bestscore;
+
     static void display(int[][] grid) {
         String text;
+        System.out.println("Score: " + String.valueOf(score));
+        System.out.println("Best: " + String.valueOf(bestscore));
         for (int i = 0; i < grid.length; i++) {
             for (int j = 0; j < grid[i].length; j++) {
                 text = String.valueOf(grid[i][j]);
@@ -67,8 +71,12 @@ public class App {
                 if (grid[i][j] == grid[i][j + 1]) {
                     grid[i][j] = grid[i][j] + grid[i][j + 1];
                     grid[i][j + 1] = 0;
+                    score += grid[i][j];
                 }
             }
+        }
+        if (score > bestscore) {
+            bestscore = score;
         }
     }
 
@@ -115,6 +123,7 @@ public class App {
     }
 
     static void save(int[][] grid) {
+        System.out.println("Saving...");
         try {
             File file = new File("save.txt");
             file.createNewFile();
@@ -123,6 +132,7 @@ public class App {
         }
         try {
             FileWriter writer = new FileWriter("save.txt");
+            writer.write(String.valueOf(score) + "," +  String.valueOf(bestscore) + "\n");
             for (int i = 0; i < grid.length; i++) {
                 for (int j = 0; j < grid[i].length; j++) {
                     if (j > 0) {
@@ -133,19 +143,29 @@ public class App {
                 writer.write("\n");
             }
             writer.close();
+            System.out.println("Saving complete!");
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     static int[][] load(int[][] grid) {
+        System.out.println("Loading...");
         try {
             File file = new File("save.txt");
             Scanner scanner = new Scanner(file);
+            String sline;
+            String split[];
+            if (scanner.hasNextLine()) {
+                sline = scanner.nextLine();
+                split = sline.split(",");
+                score = Integer.parseInt(split[0]);
+                bestscore = Integer.parseInt(split[1]);
+            }
             int i = 0;
             while (scanner.hasNextLine()) {
-                String sline = scanner.nextLine();
-                String split[] = sline.split(",");
+                sline = scanner.nextLine();
+                split = sline.split(",");
                 if (i == 0) {
                     grid = new int[split.length][split.length];
                 }
@@ -158,6 +178,7 @@ public class App {
                 }
             }
             scanner.close();
+            System.out.println("Loading complete!");
         } catch (FileNotFoundException e) {
             System.out.println("No save file found.");
         }
@@ -168,6 +189,7 @@ public class App {
         int [][] grid, tgrid;
         String input;
         grid = new int[height][width];
+        score = 0;
         generate(grid);
         while (generate(grid)) {
             display(grid);
@@ -229,6 +251,7 @@ public class App {
         int width, height;
         width = 4;
         height = 4;
+        bestscore = 0;
         Scanner scanner = new Scanner(System.in);
         while (game(width, height, scanner));
         scanner.close();
