@@ -8,26 +8,26 @@ import java.awt.event.*;
 
 public class App {
     static int score, bestscore, width, height;
-    static int [][] grid, tgrid;
+    static int[][] grid, tgrid;
     static Frame f;
     static Label[][] labels;
     static Label ls, lbs;
-    static int unit = 100;
+    static int unit = 150;
 
     static void display(int[][] grid) {
-        String text;
+        StringBuilder text;
         ls.setText(String.valueOf(score));
         lbs.setText(String.valueOf(bestscore));
         for (int i = 0; i < grid.length; i++) {
             for (int j = 0; j < grid[i].length; j++) {
-                text = String.valueOf(grid[i][j]);
+                text = new StringBuilder(String.valueOf(grid[i][j]));
                 if (grid[i][j] == 0) {
                     labels[i][j].setText("");
                 } else {
-                    labels[i][j].setText(text);
+                    labels[i][j].setText(text.toString());
                 }
                 for (int k = text.length(); k < 8; k++) {
-                    text += " ";
+                    text.append(" ");
                 }
             }
         }
@@ -36,25 +36,24 @@ public class App {
     static int generate_num() {
         if (Math.random() > 0.9) {
             return 4;
-        }
-        else {
+        } else {
             return 2;
         }
     }
 
-    static boolean generate(int[][] grid) {
+    static void generate(int[][] grid) {
         int count = 0;
-        for (int i = 0; i < grid.length; i++) {
-            for (int j = 0; j < grid[i].length; j++) {
-                if (grid[i][j] == 0) { 
+        for (int[] ints : grid) {
+            for (int anInt : ints) {
+                if (anInt == 0) {
                     count += 1;
                 }
             }
         }
         if (count == 0) {
-            return false;
+            return;
         }
-        int choice = (int)(Math.random() * count);
+        int choice = (int) (Math.random() * count);
         count = 0;
         for (int i = 0; i < grid.length; i++) {
             for (int j = 0; j < grid[i].length; j++) {
@@ -71,7 +70,6 @@ public class App {
                 break;
             }
         }
-        return true;
     }
 
     static void merge(int[][] grid) {
@@ -120,7 +118,7 @@ public class App {
         return ngrid;
     }
 
-    static boolean isdifferent(int[][] grid1, int[][]grid2) {
+    static boolean isdifferent(int[][] grid1, int[][] grid2) {
         for (int i = 0; i < grid1.length; i++) {
             for (int j = 0; j < grid1[i].length; j++) {
                 if (grid1[i][j] != grid2[i][j]) {
@@ -140,13 +138,13 @@ public class App {
         }
         try {
             FileWriter writer = new FileWriter("save.txt");
-            writer.write(String.valueOf(score) + "," +  String.valueOf(bestscore) + "\n");
-            for (int i = 0; i < grid.length; i++) {
-                for (int j = 0; j < grid[i].length; j++) {
+            writer.write(score + "," + bestscore + "\n");
+            for (int[] ints : grid) {
+                for (int j = 0; j < ints.length; j++) {
                     if (j > 0) {
                         writer.write(",");
                     }
-                    writer.write(Integer.toString(grid[i][j]));
+                    writer.write(Integer.toString(ints[j]));
                 }
                 writer.write("\n");
             }
@@ -161,7 +159,7 @@ public class App {
             File file = new File("save.txt");
             Scanner scanner = new Scanner(file);
             String sline;
-            String split[];
+            String[] split;
             if (scanner.hasNextLine()) {
                 sline = scanner.nextLine();
                 split = sline.split(",");
@@ -184,7 +182,7 @@ public class App {
                 }
             }
             scanner.close();
-        } catch (FileNotFoundException e) {
+        } catch (FileNotFoundException ignored) {
         }
         display(grid);
         return grid;
@@ -218,8 +216,6 @@ public class App {
             tgrid = rotate(rotate(tgrid));
         } else if (c == 'w') {
             tgrid = rotate(tgrid);
-        } else {
-            ;
         }
         if (isdifferent(grid, tgrid)) {
             grid = tgrid;
@@ -251,7 +247,7 @@ public class App {
                 save(grid);
                 System.exit(0);
             }
-         });
+        });
         f.addKeyListener(new KeyListener() {
             public void keyTyped(KeyEvent e) {
             }
@@ -278,51 +274,39 @@ public class App {
         });
         Label lst = new Label("Score");
         lst.setBounds(width * unit, unit / 4, unit, unit / 3);
-        lst.setAlignment(1);
+        lst.setAlignment(Label.CENTER);
         f.add(lst);
 
         Label lbst = new Label("Best Score");
         lbst.setBounds(width * unit, unit * 3 / 4, unit, unit / 3);
-        lbst.setAlignment(1);
+        lbst.setAlignment(Label.CENTER);
         f.add(lbst);
 
         ls = new Label(String.valueOf(score));
         ls.setBounds(width * unit, unit / 2, unit, unit / 3);
-        ls.setAlignment(1);
+        ls.setAlignment(Label.CENTER);
         f.add(ls);
 
         lbs = new Label(String.valueOf(bestscore));
         lbs.setBounds(width * unit, unit, unit, unit / 3);
-        lbs.setAlignment(1);
+        lbs.setAlignment(Label.CENTER);
         f.add(lbs);
 
         Button rb = new Button("Restart");
         rb.setBounds(width * unit + unit / 8, unit * 3 / 2, unit * 3 / 4, unit / 3);
-        rb.addActionListener(new ActionListener() {
-            public void actionPerformed (ActionEvent e) {
-                restart();
-            }
-        });
+        rb.addActionListener(e -> restart());
         rb.setFocusable(false);
         f.add(rb);
 
         Button sb = new Button("Save");
         sb.setBounds(width * unit + unit / 8, unit * 2, unit * 3 / 4, unit / 3);
-        sb.addActionListener(new ActionListener() {
-            public void actionPerformed (ActionEvent e) {
-                save(grid);
-            }
-        });
+        sb.addActionListener(e -> save(grid));
         sb.setFocusable(false);
         f.add(sb);
 
         Button lb = new Button("Load");
         lb.setBounds(width * unit + unit / 8, unit * 5 / 2, unit * 3 / 4, unit / 3);
-        lb.addActionListener(new ActionListener() {
-            public void actionPerformed (ActionEvent e) {
-                grid = load(grid);
-            }
-        });
+        lb.addActionListener(e -> grid = load(grid));
         lb.setFocusable(false);
         f.add(lb);
 
@@ -338,5 +322,5 @@ public class App {
 
     public static void main(String[] a) {
         initialize();
-     }
+    }
 }
