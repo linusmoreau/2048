@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.Scanner;
 
 public class Game extends Frame {
-    static final int unit = 150;
+    static final int UNIT = 150;
 
     int w;
     int h;
@@ -29,46 +29,46 @@ public class Game extends Frame {
         Tile tile;
         for (int i = 0; i < h; i++) {
             for (int j = 0; j < w; j++) {
-                tile = new Tile(j * unit, i * unit, unit, unit);
+                tile = new Tile(j * UNIT, i * UNIT, UNIT, UNIT);
                 add(tile.label);
                 tiles[i][j] = tile;
             }
         }
 
         Label lst = new Label("Score");
-        lst.setBounds(w * unit, unit / 4, unit, unit / 3);
+        lst.setBounds(w * UNIT, UNIT / 4, UNIT, UNIT / 3);
         lst.setAlignment(Label.CENTER);
         add(lst);
 
         Label lbst = new Label("Best Score");
-        lbst.setBounds(w * unit, unit * 3 / 4, unit, unit / 3);
+        lbst.setBounds(w * UNIT, UNIT * 3 / 4, UNIT, UNIT / 3);
         lbst.setAlignment(Label.CENTER);
         add(lbst);
 
         scoreLabel = new Label(String.valueOf(s.getScore()));
-        scoreLabel.setBounds(w * unit, unit / 2, unit, unit / 3);
+        scoreLabel.setBounds(w * UNIT, UNIT / 2, UNIT, UNIT / 3);
         scoreLabel.setAlignment(Label.CENTER);
         add(scoreLabel);
 
         bestscoreLabel = new Label(String.valueOf(s.getBestScore()));
-        bestscoreLabel.setBounds(w * unit, unit, unit, unit / 3);
+        bestscoreLabel.setBounds(w * UNIT, UNIT, UNIT, UNIT / 3);
         bestscoreLabel.setAlignment(Label.CENTER);
         add(bestscoreLabel);
 
         Button rb = new Button("Restart");
-        rb.setBounds(w * unit + unit / 8, unit * 3 / 2, unit * 3 / 4, unit / 3);
+        rb.setBounds(w * UNIT + UNIT / 8, UNIT * 3 / 2, UNIT * 3 / 4, UNIT / 3);
         rb.addActionListener(e -> restart());
         rb.setFocusable(false);
         add(rb);
 
         Button sb = new Button("Save");
-        sb.setBounds(w * unit + unit / 8, unit * 2, unit * 3 / 4, unit / 3);
+        sb.setBounds(w * UNIT + UNIT / 8, UNIT * 2, UNIT * 3 / 4, UNIT / 3);
         sb.addActionListener(e -> save(grid.getGrid()));
         sb.setFocusable(false);
         add(sb);
 
         Button lb = new Button("Load");
-        lb.setBounds(w * unit + unit / 8, unit * 5 / 2, unit * 3 / 4, unit / 3);
+        lb.setBounds(w * UNIT + UNIT / 8, UNIT * 5 / 2, UNIT * 3 / 4, UNIT / 3);
         lb.addActionListener(e -> load());
         lb.setFocusable(false);
         add(lb);
@@ -105,7 +105,7 @@ public class Game extends Frame {
             public void keyReleased(KeyEvent e) {
             }
         });
-        setSize((w + 1) * unit, h * unit);
+        setSize((w + 1) * UNIT, h * UNIT);
         setLayout(null);
         setVisible(true);
     }
