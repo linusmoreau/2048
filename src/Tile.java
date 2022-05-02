@@ -24,11 +24,13 @@ public class Tile extends JPanel {
     JLabel label;
     int value;
 
-    public Tile() {
+    public Tile(int size) {
         setLayout(new BorderLayout());
         label = new JLabel("", SwingConstants.CENTER);
         label.setFont(font);
         add(label, BorderLayout.CENTER);
+
+        setPreferredSize(new Dimension(size, size));
 
         setValue(0);
     }

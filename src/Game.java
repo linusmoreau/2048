@@ -26,10 +26,10 @@ public class Game extends JFrame {
         s = new ScoreKeeper();
 
         setTitle("2048");
-        setLayout(new BorderLayout());
+        setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
 
-        add(makeGridPanel(), BorderLayout.WEST);
-        add(makeSidePanel(), BorderLayout.EAST);
+        add(makeGridPanel());
+        add(makeSidePanel());
 
         load();
 
@@ -74,18 +74,19 @@ public class Game extends JFrame {
         Tile tile;
         for (int i = 0; i < h; i++) {
             for (int j = 0; j < w; j++) {
-                tile = new Tile();
+                tile = new Tile(UNIT);
                 tiles[i][j] = tile;
                 gridPanel.add(tile);
             }
         }
-        gridPanel.setPreferredSize(new Dimension(w * UNIT, h * UNIT));
         return gridPanel;
     }
 
     private JPanel makeSidePanel() {
         JPanel sidePanel = new JPanel();
         sidePanel.setLayout(new BoxLayout(sidePanel, BoxLayout.Y_AXIS));
+        sidePanel.setPreferredSize(new Dimension(UNIT, h * UNIT));
+
         sidePanel.add(Box.createRigidArea(new Dimension(UNIT, 0)));
 
         JLabel lst = new JLabel("Score\n", JLabel.CENTER);
@@ -124,7 +125,7 @@ public class Game extends JFrame {
     }
 
     private void addToBox(JPanel box, JComponent c) {
-        box.add(Box.createRigidArea(new Dimension(0, 5)));
+        box.add(Box.createRigidArea(new Dimension(0, 4)));
         c.setAlignmentX(Component.CENTER_ALIGNMENT);
         box.add(c);
     }
