@@ -1,3 +1,4 @@
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -9,69 +10,26 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
 
-public class Game extends Frame {
+public class Game extends JFrame {
     static final int UNIT = 150;
 
-    int w;
-    int h;
-    ScoreKeeper s;
-    Tile[][] tiles;
-    Label scoreLabel, bestscoreLabel;
-    Grid grid;
+    private int w;
+    private int h;
+    private ScoreKeeper s;
+    private Tile[][] tiles;
+    private JLabel scoreLabel, bestscoreLabel;
+    private Grid grid;
 
     public Game(int w, int h) {
         this.w = w;
         this.h = h;
         s = new ScoreKeeper();
-        this.setTitle("2048");
 
-        tiles = new Tile[h][w];
-        Tile tile;
-        for (int i = 0; i < h; i++) {
-            for (int j = 0; j < w; j++) {
-                tile = new Tile(j * UNIT, i * UNIT, UNIT, UNIT);
-                add(tile.label);
-                tiles[i][j] = tile;
-            }
-        }
+        setTitle("2048");
+        setLayout(new BorderLayout());
 
-        Label lst = new Label("Score");
-        lst.setBounds(w * UNIT, UNIT / 4, UNIT, UNIT / 3);
-        lst.setAlignment(Label.CENTER);
-        add(lst);
-
-        Label lbst = new Label("Best Score");
-        lbst.setBounds(w * UNIT, UNIT * 3 / 4, UNIT, UNIT / 3);
-        lbst.setAlignment(Label.CENTER);
-        add(lbst);
-
-        scoreLabel = new Label(String.valueOf(s.getScore()));
-        scoreLabel.setBounds(w * UNIT, UNIT / 2, UNIT, UNIT / 3);
-        scoreLabel.setAlignment(Label.CENTER);
-        add(scoreLabel);
-
-        bestscoreLabel = new Label(String.valueOf(s.getBestScore()));
-        bestscoreLabel.setBounds(w * UNIT, UNIT, UNIT, UNIT / 3);
-        bestscoreLabel.setAlignment(Label.CENTER);
-        add(bestscoreLabel);
-
-        Button rb = new Button("Restart");
-        rb.setBounds(w * UNIT + UNIT / 8, UNIT * 3 / 2, UNIT * 3 / 4, UNIT / 3);
-        rb.addActionListener(e -> restart());
-        rb.setFocusable(false);
-        add(rb);
-
-        Button sb = new Button("Save");
-        sb.setBounds(w * UNIT + UNIT / 8, UNIT * 2, UNIT * 3 / 4, UNIT / 3);
-        sb.addActionListener(e -> save(grid.getGrid()));
-        sb.setFocusable(false);
-        add(sb);
-
-        Button lb = new Button("Load");
-        lb.setBounds(w * UNIT + UNIT / 8, UNIT * 5 / 2, UNIT * 3 / 4, UNIT / 3);
-        lb.addActionListener(e -> load());
-        lb.setFocusable(false);
-        add(lb);
+        add(makeGridPanel(), BorderLayout.WEST);
+        add(makeSidePanel(), BorderLayout.EAST);
 
         load();
 
@@ -105,9 +63,70 @@ public class Game extends Frame {
             public void keyReleased(KeyEvent e) {
             }
         });
-        setSize((w + 1) * UNIT, h * UNIT);
-        setLayout(null);
+        pack();
         setVisible(true);
+    }
+
+    private JPanel makeGridPanel() {
+        JPanel gridPanel = new JPanel();
+        gridPanel.setLayout(new GridLayout(4, 4));
+        tiles = new Tile[h][w];
+        Tile tile;
+        for (int i = 0; i < h; i++) {
+            for (int j = 0; j < w; j++) {
+                tile = new Tile();
+                tiles[i][j] = tile;
+                gridPanel.add(tile);
+            }
+        }
+        gridPanel.setPreferredSize(new Dimension(w * UNIT, h * UNIT));
+        return gridPanel;
+    }
+
+    private JPanel makeSidePanel() {
+        JPanel sidePanel = new JPanel();
+        sidePanel.setLayout(new BoxLayout(sidePanel, BoxLayout.Y_AXIS));
+        sidePanel.add(Box.createRigidArea(new Dimension(UNIT, 0)));
+
+        JLabel lst = new JLabel("Score\n", JLabel.CENTER);
+        scoreLabel = new JLabel(String.valueOf(s.getScore()), JLabel.CENTER);
+        sidePanel.add(Box.createVerticalGlue());
+        addToBox(sidePanel, lst);
+        addToBox(sidePanel, scoreLabel);
+
+        JLabel lbst = new JLabel("Best Score", JLabel.CENTER);
+        bestscoreLabel = new JLabel(String.valueOf(s.getBestScore()), JLabel.CENTER);
+        sidePanel.add(Box.createVerticalGlue());
+        addToBox(sidePanel, lbst);
+        addToBox(sidePanel, bestscoreLabel);
+
+        JButton rb = new JButton("Restart");
+        rb.addActionListener(e -> restart());
+        rb.setFocusable(false);
+
+        JButton sb = new JButton("Save");
+        sb.addActionListener(e -> save(grid.getGrid()));
+        sb.setFocusable(false);
+
+        JButton lb = new JButton("Load");
+        lb.addActionListener(e -> load());
+        lb.setFocusable(false);
+
+        sidePanel.add(Box.createVerticalGlue());
+        addToBox(sidePanel, rb);
+        sidePanel.add(Box.createVerticalGlue());
+        addToBox(sidePanel, sb);
+        sidePanel.add(Box.createVerticalGlue());
+        addToBox(sidePanel, lb);
+        sidePanel.add(Box.createVerticalGlue());
+
+        return sidePanel;
+    }
+
+    private void addToBox(JPanel box, JComponent c) {
+        box.add(Box.createRigidArea(new Dimension(0, 5)));
+        c.setAlignmentX(Component.CENTER_ALIGNMENT);
+        box.add(c);
     }
 
     private void restart() {
@@ -156,7 +175,11 @@ public class Game extends Frame {
     private void save(int[][] grid) {
         try {
             File file = new File("save.txt");
-            file.createNewFile();
+            if (file.createNewFile()) { // file didn't exist and has been created
+                System.out.println("New save file created");
+            } else {                    // file already exists
+                System.out.println("Save file overwritten");
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -180,17 +203,11 @@ public class Game extends Frame {
     }
 
     public void display(int[][] grid) {
-        StringBuilder text;
         scoreLabel.setText(String.valueOf(s.getScore()));
         bestscoreLabel.setText(String.valueOf(s.getBestScore()));
         for (int i = 0; i < w; i++) {
             for (int j = 0; j < h; j++) {
-                text = new StringBuilder(String.valueOf(grid[i][j]));
-                if (grid[i][j] == 0) {
-                    tiles[i][j].setText("");
-                } else {
-                    tiles[i][j].setText(text.toString());
-                }
+                tiles[i][j].setValue(grid[i][j]);
             }
         }
     }
