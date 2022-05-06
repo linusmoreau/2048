@@ -28,10 +28,10 @@ public class Game extends JFrame {
         setTitle("2048");
         setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
 
+        load();
         add(makeGridPanel());
         add(makeSidePanel());
-
-        load();
+        display(grid.getGrid());
 
         addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
@@ -69,7 +69,7 @@ public class Game extends JFrame {
 
     private JPanel makeGridPanel() {
         JPanel gridPanel = new JPanel();
-        gridPanel.setLayout(new GridLayout(4, 4));
+        gridPanel.setLayout(new GridLayout(h, w));
         tiles = new Tile[h][w];
         Tile tile;
         for (int i = 0; i < h; i++) {
@@ -170,7 +170,6 @@ public class Game extends JFrame {
             grid = new Grid(w, h, s, this);
             grid.begin();
         }
-        display(grid.getGrid());
     }
 
     private void save(int[][] grid) {
@@ -206,8 +205,8 @@ public class Game extends JFrame {
     public void display(int[][] grid) {
         scoreLabel.setText(String.valueOf(s.getScore()));
         bestscoreLabel.setText(String.valueOf(s.getBestScore()));
-        for (int i = 0; i < w; i++) {
-            for (int j = 0; j < h; j++) {
+        for (int i = 0; i < h; i++) {
+            for (int j = 0; j < w; j++) {
                 tiles[i][j].setValue(grid[i][j]);
             }
         }
