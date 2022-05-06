@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.Scanner;
 
 public class Game extends JFrame {
-    static final int UNIT = 150;
+    private static final int UNIT = 128;
 
     private int w;
     private int h;
@@ -28,7 +28,8 @@ public class Game extends JFrame {
         setTitle("2048");
         setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
 
-        load();
+        grid = new Grid(w, h, s, this);
+        grid.begin();
         add(makeGridPanel());
         add(makeSidePanel());
         display(grid.getGrid());
@@ -64,6 +65,7 @@ public class Game extends JFrame {
             }
         });
         pack();
+        setLocationRelativeTo(null);
         setVisible(true);
     }
 
