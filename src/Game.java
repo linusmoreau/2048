@@ -5,12 +5,10 @@ import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Scanner;
 
-public class Game extends JFrame {
+public class Game extends Menu {
     private static final int UNIT = 128;
 
     private int w;
@@ -19,6 +17,8 @@ public class Game extends JFrame {
     private Tile[][] tiles;
     private JLabel scoreLabel, bestscoreLabel;
     private Grid grid;
+    private JPanel gridPanel;
+    private final JPanel sidePanel;
 
     public Game(int w, int h) {
         this.w = w;
@@ -30,8 +30,10 @@ public class Game extends JFrame {
 
         grid = new Grid(w, h, s, this);
         grid.begin();
-        add(makeGridPanel());
-        add(makeSidePanel());
+        gridPanel = makeGridPanel();
+        add(gridPanel);
+        sidePanel = makeSidePanel();
+        add(sidePanel);
         display(grid.getGrid());
 
         addWindowListener(new WindowAdapter() {
@@ -103,6 +105,9 @@ public class Game extends JFrame {
         addToBox(sidePanel, lbst);
         addToBox(sidePanel, bestscoreLabel);
 
+        JButton gb = makeNewGameButton();
+        gb.setFocusable(false);
+
         JButton rb = new JButton("Restart");
         rb.addActionListener(e -> restart());
         rb.setFocusable(false);
@@ -112,9 +117,11 @@ public class Game extends JFrame {
         sb.setFocusable(false);
 
         JButton lb = new JButton("Load");
-        lb.addActionListener(e -> load());
+        lb.addActionListener(e -> gameLoad());
         lb.setFocusable(false);
 
+        sidePanel.add(Box.createVerticalGlue());
+        addToBox(sidePanel, gb);
         sidePanel.add(Box.createVerticalGlue());
         addToBox(sidePanel, rb);
         sidePanel.add(Box.createVerticalGlue());
@@ -139,39 +146,34 @@ public class Game extends JFrame {
         display(grid.getGrid());
     }
 
-    private void load() {
-        try {
-            File file = new File("save.txt");
-            Scanner scanner = new Scanner(file);
-            String sline;
-            String[] split;
-            if (scanner.hasNextLine()) {
-                sline = scanner.nextLine();
-                split = sline.split(",");
-                s.setScore(Integer.parseInt(split[0]));
-                s.setBestScore(Integer.parseInt(split[1]));
-            }
-            if (scanner.hasNextLine()) {
-                sline = scanner.nextLine();
-                split = sline.split(",");
-                w = Integer.parseInt(split[0]);
-                h = Integer.parseInt(split[1]);
-                int[][] g = new int[h][w];
-                for (int i = 0; i < h; i++) {
-                    sline = scanner.nextLine();
-                    split = sline.split(",");
-                    for (int j = 0; j < w; j++) {
-                        g[i][j] = Integer.parseInt(split[j]);
-                    }
-                }
-                grid = new Grid(w, h, s, this);
-                grid.setGrid(g);
-            }
-            scanner.close();
-        } catch (FileNotFoundException ignored) {
-            grid = new Grid(w, h, s, this);
-            grid.begin();
-        }
+    private void reloadGUI() {
+        remove(gridPanel);
+        remove(sidePanel);
+        gridPanel = makeGridPanel();
+        add(gridPanel);
+        add(sidePanel);
+        pack();
+        setLocationRelativeTo(null);
+    }
+
+    public void setScores(int score, int bestscore) {
+        s.setScore(score);
+        s.setBestScore(bestscore);
+    }
+
+    public void setGrid(int w, int h, int[][] g) {
+        grid = new Grid(w, h, s, this);
+        this.w = w;
+        this.h = h;
+        grid.setGrid(g);
+        reloadGUI();
+        display(grid.getGrid());
+    }
+
+    private void gameLoad() {
+        int[][] data = load();
+        setScores(data[0][0], data[0][1]);
+        setGrid(data[1][0], data[1][1], getGrid(data[1][0], data[1][1], data));
     }
 
     private void save(int[][] grid) {

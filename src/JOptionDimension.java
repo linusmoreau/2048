@@ -21,7 +21,7 @@ public class JOptionDimension extends JPanel {
                 JOptionPane.PLAIN_MESSAGE, null);
         if (result == JOptionPane.OK_OPTION) {
             try {
-                width = getGameWidth();
+            width = getGameWidth();
                 height = getGameHeight();
                 confirmed = true;
             } catch (NumberFormatException ignored) {
