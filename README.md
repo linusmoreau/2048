@@ -7,8 +7,9 @@ Re-implementation of the web game 2048, except in Java and GUI made with Swing.
 - Grid dimensions are easily customizable
 
 ### Future features
-- Adapt save system to have a unique save for every played set of dimensions
 - Add game rule variations, such as following sequences (e.g. Fibonacci)
+- Adapt save system to allow multiple save files and selection when loading/saving
+- Encrypt save files to prevent manipulation of game state
 
 
 ### Screenshots
